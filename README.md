@@ -6,3 +6,5 @@ This repo is to keep my learning materials from coursera.
 -----------------------------------------
 Courses taken that are kept here:  
 
+Optimisation:  
+    - Discrete Optimisation  
