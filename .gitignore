@@ -3,5 +3,5 @@
 *.zip
 __pycache__/
 *~    # Ignore all files ending with ~ (tilde)
-
+venv/
 
