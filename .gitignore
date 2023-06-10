@@ -1,0 +1,7 @@
+# This is the gitignore file to make sure I dont upload everything
+
+*.zip
+__pycache__/
+*~    # Ignore all files ending with ~ (tilde)
+
+
