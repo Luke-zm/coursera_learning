@@ -4,5 +4,5 @@
 __pycache__/
 *~    # Ignore all files ending with ~ (tilde)
 venv/
-*..Identifier  
+*.Identifier  
 
