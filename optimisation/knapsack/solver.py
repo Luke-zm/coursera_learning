@@ -17,9 +17,6 @@ def trivial_sol(val, weight, taken, items, capacity):
     return val, taken
 
 def dynamic_programming(taken, items, capacity):
-    # print(taken)
-    # print(items)
-    # print(capacity)
     # Using Dynamic Programming to solve the problem
     # Filter the problem column by column
 
@@ -36,12 +33,6 @@ def dynamic_programming(taken, items, capacity):
     for item in items:
         wt.append(item.weight)
         val.append(item.value)
-    
-    # Print the table to check, delete in production
-    # print(table)
-
-    # value is the number on the btm right corner
-    # val = table[-1,-1]
 
     # sequence is found by checking from btm right corner
     for item in range(num_col):
