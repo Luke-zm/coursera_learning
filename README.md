@@ -8,6 +8,6 @@ Courses taken that are kept here:
 
 Optimisation:  
     * Discrete Optimisation  
-    ------------------
+    ------------------  
         * Dynamic Optimisation (Knapsack Problem)   
             * Points to note: memory issue if weight is too large for 1 single solve!   
