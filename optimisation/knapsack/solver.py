@@ -1,9 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import numpy as np
+from queue import Queue
+from typing import List
 
 from collections import namedtuple
-Item = namedtuple("Item", ['index', 'value', 'weight'])
+Item = namedtuple("Item", ['index', 'value', 'weight', 'ratio', 'taken'])
 
 def trivial_sol(val, weight, taken, items, capacity):
     # a trivial algorithm for filling the knapsack
@@ -76,25 +78,10 @@ def dynamic_programming(taken, items, capacity):
 
     return final_val, taken
 
-def solve_it(input_data):
-    # Modify this code to run your optimization algorithm
-
-    # parse the input
-    lines = input_data.split('\n')
-
-    firstLine = lines[0].split()
-    item_count = int(firstLine[0])
-    capacity = int(firstLine[1])
-
-    items = []
-
-    for i in range(1, item_count+1):
-        line = lines[i]
-        parts = line.split()
-        items.append(Item(i-1, int(parts[0]), int(parts[1])))
-
-    # a trivial algorithm for filling the knapsack
-    # it takes items in-order until the knapsack is full
+def call_naive_DP(items, capacity):
+    ''' Call Naive when array too large
+    else use DP
+    '''
     value = 0
     weight = 0
     taken = [0]*len(items)
@@ -110,10 +97,134 @@ def solve_it(input_data):
         value, taken = trivial_sol(value, weight, taken, items, capacity)
     else:
         value, taken = dynamic_programming(taken, items, capacity)
+    return value, taken
+
+def cal_upper_bound(items, capacity):
+    '''Find the upper bound of the solution
+    '''
+    # prepare the items as lists for easier manipulation
+    val_w_ratio = []
+    weights = []
+    for item in items:
+       val_w_ratio.append((item.value)/(item.weight))
+       weights.append(item.weight)
+    zipped = zip(val_w_ratio, weights)
+    sorted_val_w_ratio = sorted(zipped, key= lambda x:x[0], reverse=True)
+    print(sorted_val_w_ratio)
+    # w = 0
+    i = 0
+    best_est = 0 
+    cap_left = capacity
     
+    while cap_left > 0:
+        if (cap_left > sorted_val_w_ratio[i][1]):
+            print(cap_left)
+            # take entire item
+            best_est = best_est + sorted_val_w_ratio[i][0] * sorted_val_w_ratio[i][1]
+            # w = w + sorted_val_w_ratio[i][1]
+            cap_left = cap_left - sorted_val_w_ratio[i][1]
+            i = i + 1
+            print(cap_left)
+        else:
+            # take fraction of item
+            best_est = best_est + (sorted_val_w_ratio[i][0] * (cap_left/sorted_val_w_ratio[i][1]))
+            cap_left = cap_left - cap_left
+            i = i + 1
+    return best_est
+
+def sort_n_zip(items):
+    '''Sort and zip items
+    '''
+    val_w_ratio = []
+    weights = []
+    for item in items:
+       val_w_ratio.append((item.value)/(item.weight))
+       weights.append(item.weight)
+    zipped = zip(val_w_ratio, weights)
+    sorted_val_w_ratio = sorted(zipped, key= lambda x:x[0], reverse=True)
+    return sorted_val_w_ratio
+
+def cal_val_take(depth, items, current_val, capacity_left):
+    '''What happens if item taken
+    '''
+    current_val = current_val + items[depth].value
+    capacity_left = capacity_left - items[depth].weight
+    return current_val, capacity_left
+
+
+def call_BB(items, capacity):
+    '''Try Branch and Bound
+    '''
+    items.sort(key=lambda x:x.ratio, reverse=True)
+    print(items)
+    # knapsack = Knapsack(capacity, items)
+    max_depth = len(items)
+    depth = 0
+    current_val = 0
+    best_val = 0
+    capacity_left = capacity
+
+    # While there are capcity in knapsack
+    while capacity_left > 0:
+        best_val=current_val
+        # Find what is the upper bound
+        best_est = cal_upper_bound(items, capacity_left)
+        print(f"best est: {best_est}")
+        # take the item
+        current_val, capacity_left = cal_val_take(depth, items, current_val, capacity_left)
+        print(f"val taken: {current_val}, cap_left: {capacity_left}")
+        # Increase the depth if not at the btm of tree 
+        if depth < max_depth:
+            depth = depth + 1
+        else:
+            depth = 0
+            capacity_left = -1
+        print(best_val)
+    print(f"Best val of branch: {best_val}")
+        # val_dont_take, wt_dont_take = cal_val_dont_take(items, current_val,capacity_left)
+
+    taken = []
+    for item in items:
+        if item.taken == 1:
+            taken.append(1)
+        else:
+            taken.append(0)
+    value = 1
+    return value, taken
+
+def solve_it(input_data):
+    # Modify this code to run your optimization algorithm
+
+    # parse the input
+    lines = input_data.split('\n')
+
+    firstLine = lines[0].split()
+    item_count = int(firstLine[0])
+    capacity = int(firstLine[1])
+
+    items = []
+
+    for i in range(1, item_count+1):
+        line = lines[i]
+        parts = line.split()
+        items.append(Item(i-1, int(parts[0]), int(parts[1]),
+                           int(parts[0])/int(parts[1]), 0))
+    # for i in range(1, item_count+1):
+    #     line = lines[i]
+    #     parts = line.split()
+    #     items.append((i-1, int(parts[0]), int(parts[1])))
+    # items.sort(key=lambda x:x.ratio, reverse=True)
+    # print(vars(items))
+
+    # # Call Branch and Bound to solve problem
+    # value, taken = call_BB(items, capacity)
+
+    # Call trivial when problem too large, else use DP
+    value, taken = call_naive_DP(items, capacity)
     
     # prepare the solution in the specified output format
     output_data = str(value) + ' ' + str(0) + '\n'
+    # taken = taken
     output_data += ' '.join(map(str, taken))
     return output_data
 
