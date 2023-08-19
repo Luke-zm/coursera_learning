@@ -102,32 +102,30 @@ def call_naive_DP(items, capacity):
 def cal_upper_bound(items, capacity):
     '''Find the upper bound of the solution
     '''
-    # prepare the items as lists for easier manipulation
-    val_w_ratio = []
-    weights = []
-    for item in items:
-       val_w_ratio.append((item.value)/(item.weight))
-       weights.append(item.weight)
-    zipped = zip(val_w_ratio, weights)
-    sorted_val_w_ratio = sorted(zipped, key= lambda x:x[0], reverse=True)
-    print(sorted_val_w_ratio)
-    # w = 0
+    # # prepare the items as lists for easier manipulation
+    # val_w_ratio = []
+    # weights = []
+    # for item in items:
+    #    val_w_ratio.append((item.value)/(item.weight))
+    #    weights.append(item.weight)
+    # zipped = zip(val_w_ratio, weights)
+    # sorted_val_w_ratio = sorted(zipped, key= lambda x:x[0], reverse=True)
+    # print(sorted_val_w_ratio)
+    # # w = 0
     i = 0
     best_est = 0 
     cap_left = capacity
     
     while cap_left > 0:
-        if (cap_left > sorted_val_w_ratio[i][1]):
-            print(cap_left)
+        if (cap_left > items[i].weight):
             # take entire item
-            best_est = best_est + sorted_val_w_ratio[i][0] * sorted_val_w_ratio[i][1]
+            best_est = best_est + items[i].value
             # w = w + sorted_val_w_ratio[i][1]
-            cap_left = cap_left - sorted_val_w_ratio[i][1]
+            cap_left = cap_left - items[i].weight
             i = i + 1
-            print(cap_left)
         else:
             # take fraction of item
-            best_est = best_est + (sorted_val_w_ratio[i][0] * (cap_left/sorted_val_w_ratio[i][1]))
+            best_est = best_est + items[i].ratio * cap_left
             cap_left = cap_left - cap_left
             i = i + 1
     return best_est
@@ -216,11 +214,11 @@ def solve_it(input_data):
     # items.sort(key=lambda x:x.ratio, reverse=True)
     # print(vars(items))
 
-    # # Call Branch and Bound to solve problem
-    # value, taken = call_BB(items, capacity)
+    # Call Branch and Bound to solve problem
+    value, taken = call_BB(items, capacity)
 
-    # Call trivial when problem too large, else use DP
-    value, taken = call_naive_DP(items, capacity)
+    # # Call trivial when problem too large, else use DP
+    # value, taken = call_naive_DP(items, capacity)
     
     # prepare the solution in the specified output format
     output_data = str(value) + ' ' + str(0) + '\n'
